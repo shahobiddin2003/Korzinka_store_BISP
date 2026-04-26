@@ -11,14 +11,14 @@ TagManager:
   - 
   - Water
   - UI
-  - Stock
-  - Shelf
+  - StockLayer
+  - shelf
   - StockBox
   - Bin
-  - Furniture
+  - furniture
   - PlayerBlockers
-  - Player
-  - Checkout
+  - PlayerLayer
+  - CheckOut
   - 
   - 
   - 

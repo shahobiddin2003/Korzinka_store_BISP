@@ -1,21 +1,24 @@
-using System.Collections.Generic;
 using UnityEngine;
+using System.Collections.Generic;
 
 public class FurnitureController : MonoBehaviour
 {
+
+
     public GameObject mainObject, placingObject;
     public Collider col;
 
     public float price;
-
     public Transform standPoint;
-
     public List<ShelfSpaceController> shelves;
+
+
+
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        if(shelves.Count > 0)
+        if (shelves.Count > 0)
         {
             StoreController.instance.shelvingCases.Add(this);
         }
@@ -27,7 +30,9 @@ public class FurnitureController : MonoBehaviour
         
     }
 
-    public void MakePlaceable()
+
+
+    public void MakePlacable()
     {
         mainObject.SetActive(false);
         placingObject.SetActive(true);
@@ -36,8 +41,14 @@ public class FurnitureController : MonoBehaviour
 
     public void PlaceFurniture()
     {
+
         mainObject.SetActive(true);
         placingObject.SetActive(false);
         col.enabled = true;
     }
+
+
+
+
+
 }

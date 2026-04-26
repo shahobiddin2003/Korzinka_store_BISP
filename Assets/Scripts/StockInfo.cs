@@ -4,14 +4,16 @@ using UnityEngine;
 public class StockInfo
 {
     public string name;
-
     public enum StockType
     {
-        cereal, bigDrink, chipsTube, fruit, fruitLarge
-    }
+        cereal, bigDrink, chipsTube, fruit, fruitlarge
+
+    };
     public StockType typeOfStock;
 
     public float price, currentPrice;
 
-    public StockObject stockObject;
+
+    public StockObject stockobject;
+
 }

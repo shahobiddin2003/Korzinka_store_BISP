@@ -1,93 +1,91 @@
-using System.Collections.Generic;
 using UnityEngine;
+using System.Collections.Generic;
 
 public class StockBoxController : MonoBehaviour
 {
-    public StockInfo info; 
-
-    public List<Transform> bigDrinkPoints;
-    public List<Transform> cerealPoints, tubeChipsPoints, fruitPoints, largeFruitPoints;
+    public StockInfo info;
+    public List<StockObject> objectOnShelf;
+    public List<Transform> bigDrinkPoints, cerealPoints, tubeChipsPoints, fruitPoints, LargefruitPoints;
 
     public List<StockObject> stockInBox;
 
     public bool testFill;
-
     public Rigidbody theRB;
     public Collider col;
-
     private bool isHeld;
-
     public float moveSpeed = 5f;
-
     public GameObject flap1, flap2;
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
+
     void Start()
     {
-        
+
     }
 
     // Update is called once per frame
     void Update()
     {
-        if(testFill == true)
+        if (testFill == true)
         {
-            testFill = false;
-
             SetupBox(info);
         }
 
-        if (isHeld == true)
+        if (isHeld == true) 
         {
             transform.localPosition = Vector3.MoveTowards(transform.localPosition, Vector3.zero, moveSpeed * Time.deltaTime);
             transform.localRotation = Quaternion.Slerp(transform.localRotation, Quaternion.identity, moveSpeed * Time.deltaTime);
+
+
+
         }
+
+
+
     }
 
-    public void SetupBox(StockInfo stockType)
+
+    public void SetupBox(StockInfo stocktype)
     {
-        info = stockType;
+        info = stocktype;
 
         List<Transform> activePoints = new List<Transform>();
 
         switch (info.typeOfStock)
         {
-            case StockInfo.StockType.bigDrink:
 
+            case StockInfo.StockType.bigDrink:
                 activePoints.AddRange(bigDrinkPoints);
 
                 break;
-
             case StockInfo.StockType.cereal:
-
                 activePoints.AddRange(cerealPoints);
 
                 break;
-
             case StockInfo.StockType.chipsTube:
-
                 activePoints.AddRange(tubeChipsPoints);
 
                 break;
-
             case StockInfo.StockType.fruit:
-
                 activePoints.AddRange(fruitPoints);
 
                 break;
-
-            case StockInfo.StockType.fruitLarge:
-
-                activePoints.AddRange(largeFruitPoints);
+            case StockInfo.StockType.fruitlarge:
+                activePoints.AddRange(LargefruitPoints);
 
                 break;
+
+
+
+
         }
 
         if (stockInBox.Count == 0)
         {
             for (int i = 0; i < activePoints.Count; i++)
             {
-                StockObject stock = Instantiate(stockType.stockObject, activePoints[i]);
+                StockObject stock = Instantiate(stocktype.stockobject, activePoints[i]);
+
+
                 stock.transform.localPosition = Vector3.zero;
                 stock.transform.localRotation = Quaternion.identity;
 
@@ -98,22 +96,23 @@ public class StockBoxController : MonoBehaviour
         }
 
     }
-    public void Pickup()
+
+    public void pickUp()
     {
         theRB.isKinematic = true;
 
+       
         col.enabled = false;
-
         isHeld = true;
     }
+
 
     public void Release()
     {
         theRB.isKinematic = false;
-
         col.enabled = true;
-
         isHeld = false;
+
     }
 
     public void OpenClose()
@@ -122,15 +121,15 @@ public class StockBoxController : MonoBehaviour
         {
             flap1.SetActive(false);
             flap2.SetActive(false);
-        } else
+
+        }
+        else
         {
             flap1.SetActive(true);
             flap2.SetActive(true);
-        }
 
-        if (AudioManager.instance != null)
-        {
-            AudioManager.instance.PlaySFX(2);
+
+
         }
     }
 
@@ -140,16 +139,19 @@ public class StockBoxController : MonoBehaviour
         {
             shelf.PlaceStock(stockInBox[stockInBox.Count - 1]);
 
-            if (stockInBox[stockInBox.Count - 1].isPlaced == true)
+            if(stockInBox[stockInBox.Count - 1].isPlaced == true)
             {
                 stockInBox.RemoveAt(stockInBox.Count - 1);
             }
         }
 
+
         if(flap1.activeSelf == true)
         {
             OpenClose();
         }
+
+
     }
 
     public int GetStockAmount(StockInfo.StockType type)
@@ -159,36 +161,29 @@ public class StockBoxController : MonoBehaviour
         switch(type)
         {
             case StockInfo.StockType.bigDrink:
-
-                toReturn = bigDrinkPoints.Count;
+               toReturn = bigDrinkPoints.Count;
 
                 break;
-
             case StockInfo.StockType.cereal:
-
                 toReturn = cerealPoints.Count;
 
                 break;
-
             case StockInfo.StockType.chipsTube:
-
                 toReturn = tubeChipsPoints.Count;
 
                 break;
-
             case StockInfo.StockType.fruit:
-
                 toReturn = fruitPoints.Count;
 
                 break;
-
-            case StockInfo.StockType.fruitLarge:
-
-                toReturn = largeFruitPoints.Count;
+            case StockInfo.StockType.fruitlarge:
+                toReturn = LargefruitPoints.Count;
 
                 break;
+
         }
 
         return toReturn;
     }
+
 }

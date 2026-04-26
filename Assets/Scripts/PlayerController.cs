@@ -1,51 +1,40 @@
 using UnityEngine;
-using UnityEngine.Audio;
 using UnityEngine.InputSystem;
+
 
 public class PlayerController : MonoBehaviour
 {
-
     public InputActionReference moveAction;
-
-    public CharacterController charCon;
-
+    public InputActionReference jumpAction; 
+    public CharacterController carCom;
     public float moveSpeed;
-
     private float ySpeed;
-
-    public InputActionReference jumpAction;
     public float jumpForce;
-
     public InputActionReference lookAction;
-    private float horiRot, vertRot;
+    private float horRot, verRot;
     public float lookSpeed;
     public Camera theCam;
     public float minLookAngle, maxLookAngle;
-
     public LayerMask whatIsStock;
     public float interactionRange;
 
-    private StockObject heldPickup;
+    private StockObject heldPick;
     public Transform holdPoint;
-
     public float throwForce;
 
     public LayerMask whatIsShelf;
-
     public LayerMask whatIsStockBox;
     public StockBoxController heldBox;
     public Transform boxHoldPoint;
-
     public float waitToPlaceStock;
     private float placeStockCounter;
-
     public LayerMask whatIsBin;
-
     public LayerMask whatIsFurniture;
     public Transform furniturePoint;
-    public FurnitureController heldFurniture;
-
+    public FurnitureController HeldFurniture;
     public LayerMask whatIsCheckout;
+    
+
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -56,168 +45,155 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if(UIController.instance.updatePricePanel != null)
-        {
-            if(UIController.instance.updatePricePanel.activeSelf == true)
-            {
-                return;
-            }
-        }
-
-        if(UIController.instance.buyMenuScreen != null)
-        {
-            if(UIController.instance.buyMenuScreen.activeSelf == true)
-            {
-                return;
-            }
-        }
-
-        if (UIController.instance.pauseScreen != null)
-        {
-            if (UIController.instance.pauseScreen.activeSelf == true)
-            {
-                return;
-            }
-        }
-
-        Vector2 lookinput = lookAction.action.ReadValue<Vector2>();
-
-        horiRot += lookinput.x * Time.deltaTime * lookSpeed;
-        transform.rotation = Quaternion.Euler(0f, horiRot, 0f);
-
-        vertRot -= lookinput.y * Time.deltaTime * lookSpeed;
-        vertRot = Mathf.Clamp(vertRot, minLookAngle, maxLookAngle);
-        theCam.transform.localRotation = Quaternion.Euler(vertRot, 0f, 0f);
-
         
+        if (UIController.instance.UpdatePricePanel != null)
+        {
+            if (UIController.instance.UpdatePricePanel.activeSelf == true)
+            {
+                return;
+            }
+        }
+
+        if (UIController.instance.buyMenuScreen != null)
+        {
+            if (UIController.instance.buyMenuScreen.activeSelf == true)
+            {
+                return;
+            }
+        }
+
+        Vector2 lookInput = lookAction.action.ReadValue<Vector2>();
+        horRot += lookInput.x * Time.deltaTime * lookSpeed;
+        transform.rotation = Quaternion.Euler(0f, horRot, 0f);
+
+        verRot -= lookInput.y * Time.deltaTime * lookSpeed;
+        verRot = Mathf.Clamp(verRot, minLookAngle, maxLookAngle);
+        theCam.transform.localRotation = Quaternion.Euler(verRot, 0f, 0f);
+
+
+
+
+
         Vector2 moveInput = moveAction.action.ReadValue<Vector2>();
 
-        //Debug.Log(moveInput);
-
-        //transform.position = transform.position + new Vector3(moveInput.x * Time.deltaTime * moveSpeed, 0f, moveInput.y * Time.deltaTime * moveSpeed);
-
+        //transform.position = transform.position + new Vector3(moveInput.x * Time.deltaTime *moveSpeed, 0f, moveInput.y * Time.deltaTime * moveSpeed 
         //Vector3 moveAmount = new Vector3(moveInput.x, 0f, moveInput.y);
 
         Vector3 vertMove = transform.forward * moveInput.y;
         Vector3 horiMove = transform.right * moveInput.x;
-        //Debug.Log(vertMove + "-" + horiMove);
-
         Vector3 moveAmount = horiMove + vertMove;
         moveAmount = moveAmount.normalized;
-
         moveAmount = moveAmount * moveSpeed;
 
-        if (charCon.isGrounded == true)
+        if (carCom.isGrounded == true)
         {
+
+
             ySpeed = 0f;
 
             if (jumpAction.action.WasPressedThisFrame())
             {
                 ySpeed = jumpForce;
-
-                if (AudioManager.instance != null)
-                {
-                    AudioManager.instance.PlaySFX(8);
-                }
             }
-        }
 
+
+        }
         ySpeed = ySpeed + (Physics.gravity.y * Time.deltaTime);
 
-        
-        
 
         moveAmount.y = ySpeed;
 
-        charCon.Move(moveAmount * Time.deltaTime);
+        carCom.Move(moveAmount * Time.deltaTime);
 
+        //CHECK FOR PICK UP
 
-        //check for pickup
         Ray ray = theCam.ViewportPointToRay(new Vector3(.5f, .5f, 0f));
         RaycastHit hit;
 
-        /* if(Physics.Raycast(ray, out hit, interactionRange, whatIsStock ))
+        // if (Physics.Raycast(ray, out hit, interactionRange, whatIsStock))
+        // {
+        //     Debug.Log("I SEE");
+        // }
+        // else
+        // {
+        //     Debug.Log("iDontSee");
+        // }
+
+        if (heldPick == null && heldBox == null && HeldFurniture == null)
         {
-            Debug.Log("I see a pickup");
-        } else
-        {
-            Debug.Log("I can't see anything!!!!");
-        } */
-        if (heldPickup == null && heldBox == null && heldFurniture == null)
-        {
+
+
+
             if (Mouse.current.leftButton.wasPressedThisFrame)
             {
                 if (Physics.Raycast(ray, out hit, interactionRange, whatIsStock))
                 {
-                    //Debug.Log("I see a pickup");
+                    // heldPick = hit.collider.gameObject;
+                    // heldPick.transform.SetParent(holdPoint);
+                    // heldPick.transform.localPosition = Vector3.zero;
+                    // heldPick.transform.localRotation = Quaternion.identity;
 
-                    /* heldPickup = hit.collider.gameObject;
-                    heldPickup.transform.SetParent(holdPoint);
-                    heldPickup.transform.localPosition = Vector3.zero;
-                    heldPickup.transform.localRotation = Quaternion.identity;
-
-                    heldPickup.GetComponent<Rigidbody>().isKinematic = true; */
-
-                    heldPickup = hit.collider.GetComponent<StockObject>();
-                    heldPickup.transform.SetParent(holdPoint);
-                    heldPickup.Pickup();
-
-                    if (AudioManager.instance != null)
-                    {
-                        AudioManager.instance.PlaySFX(6);
-                    }
-
+                    // heldPick.GetComponent<Rigidbody>().isKinematic = true;
+                    heldPick = hit.collider.GetComponent<StockObject>();
+                    heldPick.transform.SetParent(holdPoint);
+                    heldPick.pickUp();
                     return;
+
+
+
                 }
 
                 if (Physics.Raycast(ray, out hit, interactionRange, whatIsStockBox))
                 {
                     heldBox = hit.collider.GetComponent<StockBoxController>();
-
                     heldBox.transform.SetParent(boxHoldPoint);
-                    heldBox.Pickup();
+                    heldBox.pickUp();
 
-                    if (heldBox.flap1.activeSelf == true)
+                    if(heldBox.flap1.activeSelf == true)
                     {
                         heldBox.OpenClose();
-                    }
 
-                    if (AudioManager.instance != null)
-                    {
-                        AudioManager.instance.PlaySFX(1);
                     }
 
                     return;
                 }
-
                 if (Physics.Raycast(ray, out hit, interactionRange, whatIsCheckout))
                 {
-                    hit.collider.GetComponent<Checkout>().CheckoutCustomer();
+                    hit.collider.GetComponent<CheckOut>().CheckOutCustomer();
+                    
+
                 }
+
+
             }
 
-            if(Mouse.current.rightButton.wasPressedThisFrame)
+            if (Mouse.current.rightButton.wasPressedThisFrame)
             {
                 if (Physics.Raycast(ray, out hit, interactionRange, whatIsShelf))
                 {
-                    heldPickup = hit.collider.GetComponent<ShelfSpaceController>().GetStock();
+                    heldPick = hit.collider.GetComponent<ShelfSpaceController>().GetStock();
 
-                    if(heldPickup != null)
+                    if (heldPick != null)
                     {
-                        heldPickup.transform.SetParent(holdPoint);
-                        heldPickup.Pickup();
+                        heldPick.transform.SetParent(holdPoint);
+                        heldPick.pickUp();
+
                     }
-
                     return;
-                }
 
+                }
                 if (Physics.Raycast(ray, out hit, interactionRange, whatIsStockBox))
                 {
+
                     hit.collider.GetComponent<StockBoxController>().OpenClose();
+
+
                 }
+
+
             }
 
-            if(Keyboard.current.eKey.wasPressedThisFrame)
+            if (Keyboard.current.eKey.wasPressedThisFrame)
             {
                 if (Physics.Raycast(ray, out hit, interactionRange, whatIsShelf))
                 {
@@ -225,136 +201,135 @@ public class PlayerController : MonoBehaviour
                 }
             }
 
-            if(Keyboard.current.rKey.wasPressedThisFrame)
+            if (Keyboard.current.rKey.wasPressedThisFrame)
             {
                 if (Physics.Raycast(ray, out hit, interactionRange, whatIsFurniture))
                 {
-                    heldFurniture = hit.transform.GetComponent<FurnitureController>();
+                    HeldFurniture = hit.transform.GetComponent<FurnitureController>();
+                    HeldFurniture.transform.SetParent(furniturePoint);
+                    HeldFurniture.transform.localPosition = Vector3.zero;
+                    HeldFurniture.transform.localRotation = Quaternion.identity;
 
-                    heldFurniture.transform.SetParent(furniturePoint);
-                    heldFurniture.transform.localPosition = Vector3.zero;
-                    heldFurniture.transform.localRotation = Quaternion.identity;
+                    HeldFurniture.MakePlacable();
 
-                    heldFurniture.MakePlaceable();
-
-                    if (AudioManager.instance != null)
-                    {
-                        AudioManager.instance.PlaySFX(4);
-                    }
                 }
             }
+
+
         }
         else
         {
-            if (heldPickup != null)
+
+            if (heldPick != null)
             {
+
+
+
+
+
                 if (Mouse.current.leftButton.wasPressedThisFrame)
                 {
                     if (Physics.Raycast(ray, out hit, interactionRange, whatIsShelf))
                     {
-                        /* heldPickup.transform.position = hit.transform.position;
-                        heldPickup.transform.rotation = hit.transform.rotation;
+
+                        // heldPick.transform.position = hit.transform.position;
+                        // heldPick.transform.rotation = hit.transform.rotation;
 
 
-                        heldPickup.transform.SetParent(null);
-                        heldPickup = null; */
+                        // heldPick.transform.SetParent(null);
+                        // heldPick = null;
 
-                        /* heldPickup.MakePlaced();
+                        // heldPick.makePLaced();
+                        // heldPick.transform.SetParent(hit.transform);
+                        // heldPick = null;
 
-                        heldPickup.transform.SetParent(hit.transform);
-                        heldPickup = null; */
+                        hit.collider.GetComponent<ShelfSpaceController>().PlaceStock(heldPick);
 
-                        hit.collider.GetComponent<ShelfSpaceController>().PlaceStock(heldPickup);
-
-                        if (heldPickup.isPlaced == true)
+                        if (heldPick.isPlaced == true)
                         {
-                            heldPickup = null;
+                            heldPick = null;
                         }
 
-                        if (AudioManager.instance != null)
-                        {
-                            AudioManager.instance.PlaySFX(7);
-                        }
                     }
+
+
+
                 }
+
+
 
                 if (Mouse.current.rightButton.wasPressedThisFrame)
                 {
-                    //Rigidbody pickupRB = heldPickup.GetComponent<Rigidbody>();
-                    //pickupRB.isKinematic = false;
-
-                    heldPickup.Release();
-                    heldPickup.theRB.AddForce(theCam.transform.forward * throwForce, ForceMode.Impulse);
+                    // Rigidbody pickupRB = heldPick.GetComponent<Rigidbody>();
+                    // pickupRB.isKinematic = false;
 
 
+                    heldPick.Release();
+                    heldPick.theRB.AddForce(theCam.transform.forward * throwForce, ForceMode.Impulse);
+                    heldPick.transform.SetParent(null);
+                    heldPick = null;
 
-                    heldPickup.transform.SetParent(null);
-                    heldPickup = null;
-
-                    if (AudioManager.instance != null)
-                    {
-                        AudioManager.instance.PlaySFX(9);
-                    }
                 }
             }
 
-            if(heldBox != null)
+            if (heldBox != null)
             {
+
                 if (Mouse.current.rightButton.wasPressedThisFrame)
                 {
+                    
 
                     heldBox.Release();
                     heldBox.theRB.AddForce(theCam.transform.forward * throwForce, ForceMode.Impulse);
-
                     heldBox.transform.SetParent(null);
                     heldBox = null;
 
-                    if (AudioManager.instance != null)
-                    {
-                        AudioManager.instance.PlaySFX(0);
-                    }
                 }
-
-                if(Keyboard.current.eKey.wasPressedThisFrame)
+                if (Keyboard.current.eKey.wasPressedThisFrame)
                 {
                     heldBox.OpenClose();
                 }
 
-                if(Mouse.current.leftButton.wasPressedThisFrame)
+
+
+
+
+                if (Mouse.current.leftButton.wasPressedThisFrame)
                 {
-                    if (heldBox.stockInBox.Count > 0)
+
+
+                    if(heldBox.stockInBox.Count > 0)
                     {
+
+
+
+
 
                         if (Physics.Raycast(ray, out hit, interactionRange, whatIsShelf))
                         {
                             heldBox.PlaceStockOnShelf(hit.collider.GetComponent<ShelfSpaceController>());
 
-                            placeStockCounter = waitToPlaceStock;
 
-                            if (AudioManager.instance != null)
-                            {
-                                AudioManager.instance.PlaySFX(7);
-                            }
+                            placeStockCounter = waitToPlaceStock;
                         }
-                    } else
+
+                    }
+                    else
                     {
                         if (Physics.Raycast(ray, out hit, interactionRange, whatIsBin))
                         {
                             Destroy(heldBox.gameObject);
-
                             heldBox = null;
 
-                            if (AudioManager.instance != null)
-                            {
-                                AudioManager.instance.PlaySFX(10);
-                            }
+
                         }
                     }
 
-                    
+
                 }
 
-                if(Mouse.current.leftButton.isPressed)
+
+                if (Mouse.current.leftButton.isPressed)
                 {
                     placeStockCounter -= Time.deltaTime;
 
@@ -364,31 +339,41 @@ public class PlayerController : MonoBehaviour
                         {
                             heldBox.PlaceStockOnShelf(hit.collider.GetComponent<ShelfSpaceController>());
 
+
                             placeStockCounter = waitToPlaceStock;
                         }
                     }
-                }
-            }
 
-            if(heldFurniture != null)
+
+                }
+
+
+            }
+            if (HeldFurniture != null)
             {
-                heldFurniture.transform.position = new Vector3(furniturePoint.position.x, 0f, furniturePoint.position.z);
-                heldFurniture.transform.LookAt(new Vector3(transform.position.x, 0f, transform.position.z));
+                HeldFurniture.transform.position = new Vector3(furniturePoint.position.x, 0f, furniturePoint.position.z);
+                HeldFurniture.transform.LookAt(new Vector3(transform.position.x, 0f, transform.position.z));
 
                 if(Mouse.current.leftButton.wasPressedThisFrame || Keyboard.current.rKey.wasPressedThisFrame)
                 {
-                    heldFurniture.transform.SetParent(null);
+                    HeldFurniture.transform.SetParent(null);
+                    HeldFurniture.PlaceFurniture();
+                    
+                    HeldFurniture = null;
 
-                    heldFurniture.PlaceFurniture();
+                } 
 
-                    heldFurniture = null;
-
-                    if (AudioManager.instance != null)
-                    {
-                        AudioManager.instance.PlaySFX(5);
-                    }
-                }
             }
+
         }
+
+
+
+
+
+
+
     }
+
+
 }

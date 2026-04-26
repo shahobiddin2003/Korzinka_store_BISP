@@ -1,34 +1,35 @@
-using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using TMPro;
 using UnityEngine.SceneManagement;
+
 
 public class UIController : MonoBehaviour
 {
+
+
     public static UIController instance;
 
     private void Awake()
     {
         instance = this;
-    }
 
-    public GameObject updatePricePanel;
+
+
+
+    }    // Start is called once before the first execution of Update after the MonoBehaviour is created
+
+    public GameObject UpdatePricePanel;
 
     public TMP_Text basePriceText, currentPriceText;
-
-    public TMP_InputField priceInputfield;
-
+    public TMP_InputField priceInputField;
     private StockInfo activeStockInfo;
-
     public TMP_Text moneyText;
-
     public GameObject buyMenuScreen;
+    public GameObject PausePanel;
+    private bool isPaused = false;
+    public string menuScene;
 
-    public string mainMenuScene;
-
-    public GameObject pauseScreen;
-
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
         
@@ -37,102 +38,112 @@ public class UIController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if(Keyboard.current.tabKey.wasPressedThisFrame)
+        if (Keyboard.current.tabKey.wasPressedThisFrame)
         {
-            OpenCloseBuyMenu();
+             OpenCloseBuyMenu();
         }
 
-        if(Keyboard.current.escapeKey.wasPressedThisFrame)
+        if ( Keyboard.current.escapeKey.wasPressedThisFrame)
         {
-            PauseUnpause();
+            if (isPaused == true)
+            {
+                Resume();
+            }
+            else
+            {
+                PauseGame();
+            }
         }
     }
 
-    public void OpenUpdatePrice(StockInfo stockToUpdate)
+    public void OpenUpDatePrice(StockInfo stockToUpdate)
     {
-        updatePricePanel.SetActive(true);
-
+        UpdatePricePanel.SetActive(true);
         Cursor.lockState = CursorLockMode.None;
-
         basePriceText.text = "$" + stockToUpdate.price.ToString("F2");
         currentPriceText.text = "$" + stockToUpdate.currentPrice.ToString("F2");
 
         activeStockInfo = stockToUpdate;
 
-        priceInputfield.text = stockToUpdate.currentPrice.ToString();
+        priceInputField.text = stockToUpdate.currentPrice.ToString();
+
     }
 
-    public void CloseUpdatePrice()
+
+    public void CloseUpdatePanel()
     {
-        updatePricePanel.SetActive(false);
-
+        UpdatePricePanel.SetActive(false);
         Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = true;
     }
-
+     
     public void ApplyPriceUpdate()
     {
-        
-        activeStockInfo.currentPrice = float.Parse(priceInputfield.text);
+       
 
-        currentPriceText.text = "$" + activeStockInfo.currentPrice.ToString("F2");
+            activeStockInfo.currentPrice = float.Parse(priceInputField.text);
 
-        StockInfoController.instance.UpdatePrice(activeStockInfo.name, activeStockInfo.currentPrice);
+            currentPriceText.text = "$" + activeStockInfo.currentPrice;
 
-        CloseUpdatePrice();
-        
+            StockInfoController.instance.UpdatePrice(activeStockInfo.name, activeStockInfo.currentPrice);
+
+            CloseUpdatePanel();
+       
     }
+
 
     public void UpdateMoney(float currentMoney)
     {
         moneyText.text = "$" + currentMoney.ToString("F2");
     }
 
+
     public void OpenCloseBuyMenu()
     {
         if(buyMenuScreen.activeSelf == false)
         {
             buyMenuScreen.SetActive(true);
-
             Cursor.lockState = CursorLockMode.None;
-        } else
+        }
+        else
         {
-            buyMenuScreen.SetActive(false);
-
             Cursor.lockState = CursorLockMode.Locked;
+
+            buyMenuScreen.SetActive(false);
         }
     }
 
-    public void MainMenu()
-    {
-        SceneManager.LoadScene(mainMenuScene);
 
+    public void PauseGame()
+    {
+        PausePanel.SetActive(true);
+        Time.timeScale = 0f;
+        isPaused = true;
+        Cursor.lockState = CursorLockMode.None;
+        
+    }
+
+    public void Resume()
+    {
+        PausePanel.SetActive(false);
         Time.timeScale = 1f;
+        isPaused = false;
+        Cursor.lockState = CursorLockMode.Locked;
+        
+
+        Debug.Log("asdfasdf");
     }
 
     public void QuitGame()
     {
         Application.Quit();
 
-        Debug.Log("Quitting The Game");
+        Debug.Log("yeah");
     }
 
-    public void PauseUnpause()
+    public void BackToMainMenu()
     {
-        if(pauseScreen.activeSelf == false)
-        {
-            pauseScreen.SetActive(true);
-
-            Cursor.lockState = CursorLockMode.None;
-
-            Time.timeScale = 0f;
-
-        } else
-        {
-            pauseScreen.SetActive(false);
-
-            Cursor.lockState = CursorLockMode.Locked;
-
-            Time.timeScale = 1f;
-        }
+        SceneManager.LoadScene(menuScene);
+        Time.timeScale = 1f;
     }
 }

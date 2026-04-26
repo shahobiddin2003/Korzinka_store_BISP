@@ -3,12 +3,13 @@ using UnityEngine.SceneManagement;
 
 public class MainMenu : MonoBehaviour
 {
+
     public string mainScene;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        AudioManager.instance.StartTitleMusic();
+        
     }
 
     // Update is called once per frame
@@ -17,15 +18,19 @@ public class MainMenu : MonoBehaviour
         
     }
 
-    public void StartGame()
+
+    public void StartGame ()
     {
         SceneManager.LoadScene(mainScene);
     }
-
     public void QuitGame()
     {
         Application.Quit();
 
-        Debug.Log("Quit The Game");
+        Debug.Log("yeah");
     }
+    
+    
+
+
 }
